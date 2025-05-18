@@ -1,5 +1,12 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+import org.hibernate.service.ServiceRegistry;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -53,5 +60,36 @@ public class Util {
         } catch (SQLException e) {
             throw new RuntimeException("Соединение прервано", e);
         }
+    }
+    private static SessionFactory sessionFactory;
+
+    public static SessionFactory getHibernateSessionFactory() {
+        if (sessionFactory == null) {
+            try {
+                Configuration configuration = new Configuration();
+
+                Properties settings = new Properties();
+                settings.put(Environment.DRIVER, getProperty(DRIVER_KEY));
+                settings.put(Environment.URL, getProperty(URL_KEY));
+                settings.put(Environment.USER, getProperty(USER_KEY));
+                settings.put(Environment.PASS, getProperty(PASSWORD_KEY));
+                settings.put(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
+                settings.put(Environment.SHOW_SQL, "true");
+                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+                // settings.put(Environment.HBM2DDL_AUTO, "create-drop");
+
+
+                configuration.setProperties(settings);
+                configuration.addAnnotatedClass(User.class);
+
+                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                        .applySettings(configuration.getProperties()).build();
+
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+            } catch (Exception e) {
+                throw new RuntimeException("Hibernate initialization failed", e);
+            }
+        }
+        return sessionFactory;
     }
 }
