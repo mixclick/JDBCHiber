@@ -18,7 +18,8 @@ public class User {
     @Column(name = "age")
     private Byte age;
 
-    public User() {}
+    public User() {
+    }
 
 
     public User(String name, String lastName, Byte age) {
@@ -63,8 +64,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-               "id=" + id +
-               ", name='" + name + '\'' +
+               "name='" + name + '\'' +
                ", lastName='" + lastName + '\'' +
                ", age=" + age +
                '}';

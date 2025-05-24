@@ -4,8 +4,12 @@ import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoHibernateImpl;
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
+import jm.task.core.jdbc.util.Util;
+
+import java.util.logging.Logger;
 
 public class Main {
+    private static final Logger logger = Util.logger;
     public static void main(String[] args) {
 
         UserDao userDao = new UserDaoHibernateImpl();
@@ -14,25 +18,24 @@ public class Main {
 
         try {
             userService.createUsersTable();
-            System.out.println("Таблица users создана\n");
+            logger.info("Таблица users создана\n");
 
             saveUserWithLog(userService, "Ivan", "Ivanov", (byte) 28);
             saveUserWithLog(userService, "Maria", "Petrova", (byte) 32);
             saveUserWithLog(userService, "Alex", "Sidorov", (byte) 25);
             saveUserWithLog(userService, "Olga", "Smirnova", (byte) 30);
 
-            System.out.println("\nСписок всех пользователей:");
             userService.getAllUsers().forEach(System.out::println);
+            logger.info("\nСписок всех пользователей:");
 
             userService.cleanUsersTable();
-            System.out.println("\nТаблица users очищена");
+            logger.info("\nТаблица users очищена");
 
             userService.dropUsersTable();
-            System.out.println("Таблица users удалена");
-
-
+            logger.info("Таблица users удалена");
 
         } catch (Exception e) {
+            logger.warning(e.getMessage());
             System.err.println("Произошла ошибка: " + e.getMessage());
             throw new RuntimeException(e);
         }
@@ -40,6 +43,6 @@ public class Main {
 
     private static void saveUserWithLog(UserService service, String name, String lastName, byte age) {
         service.saveUser(name, lastName, age);
-        System.out.printf("User с именем '%s %s' добавлен в базу данных\n", name, lastName);
+        logger.info("User с именем '%s %s' добавлен в базу данных\n" + name + lastName);
     }
 }
